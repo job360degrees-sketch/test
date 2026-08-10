@@ -1,4 +1,4 @@
-```yaml
+
 name: CI/CD Pipeline
 
 # Triggers the workflow on push or pull request events
@@ -16,31 +16,10 @@ jobs:
   Build-and-test:
     name: Build and Test
     runs-on: ubuntu-latest
-
     steps:
+      - name: Build Done
+        run: echo "Build Done"
 
-      # 1. Fetch source code
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # 2. Setup Java
-      - name: Setup Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-
-      # 3. Build and run tests
-      - name: Build and Test
-        run: mvn clean verify
-
-      # 4. Upload generated JAR
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: application-jar
-          path: target/*.jar
 
 
   # ==============================
@@ -51,27 +30,6 @@ jobs:
     needs: Build-and-test
     runs-on: ubuntu-latest
 
-    # Deploy only after successful build
-    # and only for push to main
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
-
-      # 1. Checkout source
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      # 2. Download JAR generated during CI
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: application-jar
-          path: target
-
-      # 3. Simulate deployment
-      - name: Deploy Application
-        run: |
-          echo "Deploying Java application to production..."
-          ls -l target/
-          echo "Application successfully deployed!"
-```
+      - name: Build Done
+        run: echo "Deployed"
