@@ -1,6 +1,5 @@
-name: CI/CD Pipeline
+name: Node.js CI
 
-# Triggers the workflow on push or pull request events for the main branch
 on:
   push:
     branches: [ "main" ]
@@ -8,41 +7,29 @@ on:
     branches: [ "main" ]
 
 jobs:
-  # Continuous Integration Stage: Build and Test
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Source Code
+    # 1. Fetch the source code from GitHub
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup Node.js Environment
+    # 2. Setup the recommended, modern Node.js 24 environment
+    - name: Use Node.js 24
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
-        cache: 'npm'
+        node-version: '24'
+        # Only include 'cache' if package-lock.json exists in your root folder
+        cache: 'npm' 
 
-    - name: Install Dependencies
+    # 3. Install fresh dependencies using the lock file
+    - name: Install dependencies
       run: npm ci
 
-    - name: Run Code Linter
-      run: npm run lint --if-present
+    # 4. Run production builds and test suites
+    - name: Run build
+      run: npm run build --if-present
 
-    - name: Execute Automated Tests
+    - name: Run tests
       run: npm test
-
-  # Continuous Deployment Stage: Runs only if the Integration stage passes
-  deploy:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-    - name: Checkout Source Code
-      uses: actions/checkout@v4
-
-    - name: Simulate Production Deployment
-      run: |
-        echo "Deploying application to production environment..."
-        # Add actual deployment CLI commands here (e.g., AWS, Azure, Vercel, or Heroku)
-        echo "Application successfully deployed!"
