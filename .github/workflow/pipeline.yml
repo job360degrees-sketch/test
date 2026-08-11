@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+#
+=======
 
 name: Payment Service Pipeline
 
@@ -61,3 +64,5 @@ jobs:
 
     secrets:
       OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+
+>>>>>>> 33a26f9b3a797d7470b36cee3889d1177d611b2d
