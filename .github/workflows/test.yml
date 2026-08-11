@@ -1,0 +1,23 @@
+name: test-CI
+on:
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - main
+      - 'mona/octocat'
+      - 'releases/*'
+	push_request:
+	  #Sequesnce of patterns matched against refs/heads
+		branches:
+		  - main
+			- 'mona/octocat'
+			- release/*
+	jobs: 
+	build:
+	name: build jar
+	runs-on: ubuntu-latest
+    steps:
+
+      # 1. Fetch source code
+      - name: Checkout repository
+        uses: actions/checkout@v4	
