@@ -1,1 +1,63 @@
-#
+
+name: Payment Service Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    branches:
+      - main
+
+
+jobs:
+
+  ci:
+    uses: your-company/devops-cicd-platform/.github/workflows/java.yml@v1
+
+    with:
+      application-name: payment-service
+      java-version: "17"
+      artifact-repository: icici-maven-release
+
+    secrets:
+      ARTIFACTORY_URL: ${{ secrets.ARTIFACTORY_URL }}
+      ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+      ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
+
+  deploy-uat:
+    if: github.ref == 'refs/heads/main'
+
+    needs: ci
+
+    uses: your-company/devops-cicd-platform/.github/workflows/deploy.yml@v1
+
+    with:
+      application-name: payment-service
+      environment: uat
+      namespace: payment-uat
+      image: your-artifactory/payment/payment-service:${{ github.sha }}
+      openshift-api: https://openshift-uat.example.com:6443
+
+    secrets:
+      OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+
+
+  deploy-prod:
+    if: github.ref == 'refs/heads/main'
+
+    needs: deploy-uat
+
+    uses: your-company/devops-cicd-platform/.github/workflows/deploy.yml@v1
+
+    with:
+      application-name: payment-service
+      environment: production
+      namespace: payment-prod
+      image: your-artifactory/payment/payment-service:${{ github.sha }}
+      openshift-api: https://openshift-prod.example.com:6443
+
+    secrets:
+      OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
